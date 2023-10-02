@@ -1,0 +1,11 @@
+a. Identify an admissible heuristic for the Subway Navigation problem other than straight-line distance. (You can assume access to any information you would need to create one.)
+
+Another possible heuristic could be the minimum number of stops required to reach the goal station. This is admissible because it always underestimates the actual cost to reach the goal station.
+
+b. The Boston and London data each have some situations where the distance between two linked stations is less than the calculated straight-line distance between those stations. In some cases, the difference is over 200 meters or 1/8 mile. (This is a legitimate concern when compiling datasets from different sources, as I did for this project.) What is the consequence of this fact? How significant is this consequence?
+
+This causes the heuristic to no longer be admissible as it is possible to obtain a heuristic that overestimates the distance to the given station. This is significant because it can cause the algorithm to take longer to find a solution.
+
+c. When given the example input shown in Question 6, BFS and A* search find solutions quickly, while DFS takes a very long time. Would modifying DFS to use iterative deepening help the running time? Why or why not?
+
+Iterative deepening would help the running time of DFS because it would prevent the algorithm from going down wrong paths that are too deep. This would prevent the algorithm from getting stuck in the wrong path in a loop and would allow it to find a solution faster.

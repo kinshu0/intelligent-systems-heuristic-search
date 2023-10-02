@@ -1,5 +1,14 @@
 package search;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+
+import subway.SubwayMap;
+
 /**
 This code is adapted from search.py in the AIMA Python implementation, which is published with the license below:
 
@@ -22,27 +31,166 @@ public class Search{
 	// Uninformed Search algorithms
 	
 	public static Node breadthFirstSearch(Problem problem){
-		//YOUR CODE HERE
+		HashSet<String> visited = new HashSet<>();
+		LinkedList<Node> frontier = new LinkedList<>();
+
+		Node initialNode = new Node(problem.getInitial(), null, null, 0);
+
+		frontier.add(initialNode);
+
+		while (!frontier.isEmpty()) {
+			Node top = frontier.poll();
+			visited.add(top.toString());
+
+			ArrayList<Node> adjNodes = top.expand(problem);
+
+			for (Node v: adjNodes) {
+				if (!visited.contains(v.toString())) {
+					frontier.add(v);
+					if (problem.goalTest(v.getState())) {
+						printSolution(v.path(), (int) v.getPathCost(), visited.size());
+						return v;
+					}
+				}
+			}
+		}
+
 		return null;
 	}
 	
 	public static Node depthFirstSearch(Problem problem){
-		//YOUR CODE HERE
+		HashSet<String> visited = new HashSet<>();
+		LinkedList<Node> frontier = new LinkedList<>();
+
+		Node initialNode = new Node(problem.getInitial(), null, null, 0);
+
+		frontier.add(initialNode);
+
+		while (!frontier.isEmpty()) {
+			Node top = frontier.pop();
+			visited.add(top.toString());
+
+			ArrayList<Node> adjNodes = top.expand(problem);
+
+			for (Node v: adjNodes) {
+				if (!visited.contains(v.toString())) {
+					frontier.addFirst(v);
+					if (problem.goalTest(v.getState())) {
+						printSolution(v.path(), (int) v.getPathCost(), visited.size());
+						return v;
+					}
+				}
+			}
+
+		}
+
 		return null;
+
 	}
 
 	// Informed (Heuristic) Search
 	
 	public static Node aStarSearch(Problem problem){
-		//YOUR CODE HERE
+		HashSet<String> visited = new HashSet<>();
+
+		Comparator<Node> nodeComparator = new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				return Double.compare(problem.h(o1) + o1.getPathCost(), problem.h(o2) + o2.getPathCost());
+			}
+		};
+
+		PriorityQueue<Node> frontier = new PriorityQueue<>(nodeComparator);
+
+		Node initialNode = new Node(problem.getInitial(), null, null, 0);
+
+		frontier.add(initialNode);
+
+		while (!frontier.isEmpty()) {
+			Node top = frontier.poll();
+			visited.add(top.toString());
+
+			ArrayList<Node> adjNodes = top.expand(problem);
+
+			for (Node v: adjNodes) {
+				if (!visited.contains(v.toString())) {
+					frontier.add(v);
+					if (problem.goalTest(v.getState())) {
+						printSolution(v.path(), (int) v.getPathCost(), visited.size());
+						return v;
+					}
+				}
+			}
+		}
+
 		return null;
 	}
+
+	public static void printSolution(ArrayList<Node> path, int totalCost, int numNodesVisited){
+		System.out.println("Solution path:");
+		for(Node n:path){
+			System.out.print(n + " --> ");
+		}
+		System.out.println("\nTotal cost: "+totalCost);
+		System.out.println("Number of nodes visited: "+numNodesVisited);
+	}
+
+
+
 	
 	// Main
-	public static void main(String[] args){
-		//Replace this code with code that runs the program specified by
-		//the command arguments
+	public static void main(String[] args) throws FileNotFoundException{
+
+		if (args.length < 3) {
+			System.out.println("Usage: java search.Search <problem> <method> <initial state> <optional: goal state> <optional: threshold distance>");
+			return;
+		}
+
 		
-		System.out.println(args[0]);
+		String problemString = args[0].toLowerCase();
+		String method = args[1].toLowerCase();
+		String initialState = args[2].replaceAll("\"", "");
+		String goalState = null;
+		boolean useThreshold = false;
+		double thresholdDistance = -1;
+		if (args.length >= 4) {
+			goalState = args[3].replaceAll("\"", "");
+		}
+		if (args.length >= 5) {
+			useThreshold = true;
+			thresholdDistance = Double.parseDouble(args[4]);
+		}
+
+		Problem problem;
+
+		if (problemString.equals("boston")) {
+			if (useThreshold) {
+				problem = new SubwayNavigationProblemNear(initialState, goalState, SubwayMap.buildBostonMap(), thresholdDistance);
+			} else {
+				problem = new SubwayNavigationProblem(initialState, goalState, SubwayMap.buildBostonMap());
+			}
+		} else if (problemString.equals("london")) {
+			if (useThreshold) {
+				problem = new SubwayNavigationProblemNear(initialState, goalState, SubwayMap.buildLondonMap(), thresholdDistance);
+			} else {
+				problem = new SubwayNavigationProblem(initialState, goalState, SubwayMap.buildLondonMap());
+			}
+		} else if (problemString.equals("eight")) {
+			problem = new EightProblem(initialState);
+		} else {
+			System.out.println("Invalid problem");
+			return;
+		}
+
+		if (method.equals("bfs")) {
+			breadthFirstSearch(problem);
+		} else if (method.equals("dfs")) {
+			depthFirstSearch(problem);
+		} else if (method.equals("astar")) {
+			aStarSearch(problem);
+		} else {
+			System.out.println("Invalid method");
+			return;
+		}
 	}
 }
