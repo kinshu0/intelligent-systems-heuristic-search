@@ -140,6 +140,10 @@ public class Search{
 
 	public static void printSolution(ArrayList<Node> path, double totalCost, int numNodesVisited){
 		System.out.println("Solution path:");
+		if (path == null){
+			System.out.println("No solution found.");
+			return;
+		}
 		for(Node n:path){
 			System.out.print(n + " --> ");
 		}
@@ -159,6 +163,12 @@ public class Search{
 		}
 
 		
+		// String problemString = "london";
+		// String method = "bfs";
+		// String initialState = "Piccadilly Circus";
+		// String goalState = "Wimbledon";
+		// boolean useThreshold = false;
+		// double thresholdDistance = -1;
 		String problemString = args[0].toLowerCase();
 		String method = args[1].toLowerCase();
 		String initialState = args[2].replaceAll("\"", "");
