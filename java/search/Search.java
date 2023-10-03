@@ -44,6 +44,10 @@ public class Search{
 
 			ArrayList<Node> adjNodes = top.expand(problem);
 
+			if (adjNodes.isEmpty()) {
+				continue;
+			}
+
 			for (Node v: adjNodes) {
 				if (!visited.contains(v.toString())) {
 					frontier.add(v);
@@ -71,6 +75,10 @@ public class Search{
 			visited.add(top.toString());
 
 			ArrayList<Node> adjNodes = top.expand(problem);
+
+			if (adjNodes.isEmpty()) {
+				continue;
+			}
 
 			for (Node v: adjNodes) {
 				if (!visited.contains(v.toString())) {
@@ -112,11 +120,15 @@ public class Search{
 
 			ArrayList<Node> adjNodes = top.expand(problem);
 
+			if (adjNodes.isEmpty()) {
+				continue;
+			}
+
 			for (Node v: adjNodes) {
 				if (!visited.contains(v.toString())) {
 					frontier.add(v);
 					if (problem.goalTest(v.getState())) {
-						printSolution(v.path(), (int) v.getPathCost(), visited.size());
+						printSolution(v.path(), v.getPathCost(), visited.size());
 						return v;
 					}
 				}
@@ -126,7 +138,7 @@ public class Search{
 		return null;
 	}
 
-	public static void printSolution(ArrayList<Node> path, int totalCost, int numNodesVisited){
+	public static void printSolution(ArrayList<Node> path, double totalCost, int numNodesVisited){
 		System.out.println("Solution path:");
 		for(Node n:path){
 			System.out.print(n + " --> ");
@@ -153,6 +165,7 @@ public class Search{
 		String goalState = null;
 		boolean useThreshold = false;
 		double thresholdDistance = -1;
+
 		if (args.length >= 4) {
 			goalState = args[3].replaceAll("\"", "");
 		}
